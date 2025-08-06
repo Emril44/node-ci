@@ -54,17 +54,34 @@ jobs:
 
       - name: Run app on EC2 (in Docker)
         run: |
-          ssh -i ec2-key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -i ec2-key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << EOF
+          # Install Docker (if needed)
           if ! command -v docker &> /dev/null; then
-            curl -fsSL https://get.docker.com | sudo bash
-            sudo usermod -aG docker $USER
-            newgrp docker
+            sudo apt-get update
+            sudo apt-get install -y \
+              ca-certificates \
+              curl \
+              gnupg \
+              lsb-release
+
+            sudo install -m 0755 -d /etc/apt/keyrings
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+              sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+            echo \
+              "deb [arch=\$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+              https://download.docker.com/linux/ubuntu \
+              \$(lsb_release -cs) stable" | \
+              sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+            sudo apt-get update
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
           fi
 
-          docker pull ${{ secrets.DOCKER_USERNAME }}/nodeapp:${{ env.IMAGE_TAG }}
+          # Pull and run container
           docker rm -f nodeapp || true
+          docker pull ${{ secrets.DOCKER_USERNAME }}/nodeapp:${{ env.IMAGE_TAG }}
           docker run -d --name nodeapp -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/nodeapp:${{ env.IMAGE_TAG }}
           EOF
-
 
           
