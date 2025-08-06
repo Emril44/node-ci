@@ -77,6 +77,8 @@ jobs:
           # Remove existing container (if exists)
           sudo docker rm -f nodeapp || true
 
+          cd nodeapp
+
           # Pull and run the latest image
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/nodeapp:${{ env.IMAGE_TAG }}
           sudo docker compose down || true
