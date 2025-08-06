@@ -71,11 +71,14 @@ jobs:
             sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
           fi
 
-          # Stop any container using port 3000 (safely)
-          sudo docker ps --filter "publish=3000" --format "{{.ID}}" | xargs -r sudo docker stop
+          # Stop and remove all containers using port 3000
+          sudo docker ps --format '{{.ID}} {{.Ports}}' | grep '0.0.0.0:3000->' | awk '{print $1}' | xargs -r sudo docker rm -f
 
-          # Remove existing container (if exists)
-          sudo docker rm -f nodeapp || true
+          # Prune unused networks just in case
+          sudo docker network prune -f
+
+          # Prune stopped containers to prevent leftover conflicts
+          sudo docker container prune -f
 
           cd nodeapp
 
@@ -85,5 +88,5 @@ jobs:
           sudo IMAGE_TAG=${{ env.IMAGE_TAG }} docker compose up -d
 
           # Output last logs for verification
-          sudo docker logs nodeapp --tail 20
+          sudo docker compose logs app --tail=20
           EOF
