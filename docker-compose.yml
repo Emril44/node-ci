@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: emril44/nodeapp:${IMAGE_TAG}
     ports:
       - '3000:3000'
     depends_on:

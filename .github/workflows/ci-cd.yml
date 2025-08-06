@@ -79,7 +79,8 @@ jobs:
 
           # Pull and run the latest image
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/nodeapp:${{ env.IMAGE_TAG }}
-          sudo docker run -d --name nodeapp -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/nodeapp:${{ env.IMAGE_TAG }}
+          sudo docker compose down || true
+          sudo IMAGE_TAG=${{ env.IMAGE_TAG }} docker compose up -d
 
           # Output last logs for verification
           sudo docker logs nodeapp --tail 20
