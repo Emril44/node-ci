@@ -2,7 +2,7 @@ services:
   app:
     image: emril44/nodeapp:${IMAGE_TAG}
     ports:
-      - '3000:3000'
+      - '3001:3001'
     depends_on:
       - db
     volumes:
