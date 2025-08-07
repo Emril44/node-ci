@@ -15,7 +15,7 @@ client.connect()
     .catch(err => console.error('Connection error! ', err));
 
 const server = http.createServer((req, res) => {
-    res.end('this is node on docker, hello :D');
+    res.end('this is node on docker, helloooo :D');
 });
 
 server.listen(PORT, () => {
