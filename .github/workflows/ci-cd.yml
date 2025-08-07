@@ -81,6 +81,7 @@ jobs:
           sudo docker container prune -f
 
           cd nodeapp
+          sudo lsof -t -i:3000 | xargs -r sudo kill -9
 
           # Pull and run the latest image
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/nodeapp:${{ env.IMAGE_TAG }}
